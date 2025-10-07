@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bird Classifier</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8fcff;
+      text-align: center;
+      padding: 40px;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    form {
+      margin-top: 20px;
+    }
+
+    input[type="file"] {
+      padding: 8px;
+      margin-bottom: 15px;
+    }
+
+    button {
+      display: block;
+      margin: 10px auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+
+    img {
+  max-width: 300px;
+  margin: 20px auto;
+  display: none;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+
+    #result {
+      font-size: 20px;
+      margin-top: 25px;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <h1>🐦 BIRD SPECIES CLASSIFIER</h1>
+
+  <form id="upload-form" enctype="multipart/form-data">
+    <input type="file" id="file-input" name="file" accept="image/*" required />
+    
+    <!-- Button below the upload -->
+    <button type="submit">🔍 Predict</button>
+
+    <!-- Image preview -->
+    <img id="preview" alt="Image Preview" />
+  </form>
+
+  <!-- Result -->
+  <h2 id="result"></h2>
+
+  <script>
+    const form = document.getElementById('upload-form');
+    const result = document.getElementById('result');
+    const fileInput = document.getElementById('file-input');
+    const preview = document.getElementById('preview');
+
+    // Show image preview
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          preview.src = reader.result;
+          preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Handle form submit
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      result.innerText = "⏳ Predicting...";
+
+      try {
+        const response = await fetch('/predict', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+        result.innerText = "✅ Predicted: " + data.prediction;
+      } catch (error) {
+        result.innerText = "❌ Error: " + error.message;
+      }
+    });
+  </script>
+</body>
+</html>
